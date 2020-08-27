@@ -88,19 +88,13 @@ http://localhost:8900/reserve/
 
 ![N|Solid](https://github.com/lucasmezuraro/event-driven-vehicle-rent-application/blob/master/images/Rent_action.png)
 
-#
-#
-#
 
 ### Reserve history by transactionId
-#
 
 ```
-
 method: GET
 http://localhost:8900/reserve/{transactionId}
 Ex: http://localhost:8900/reserve/dde7e07b-da8e-4c70-b44a-ee567970db46
-
 ```
 
 ### Car history by carId
@@ -112,8 +106,6 @@ Ex: http://localhost:8900/reserve/2
 
 ```
 
-#
-#
 ### Payment Status
 
 ```
@@ -127,9 +119,6 @@ http://localhost:8900/payment/{transactionId}
 
 ![N|Solid](https://github.com/lucasmezuraro/event-driven-vehicle-rent-application/blob/master/images/grafana.png)
 
-#
-#
-#
 
 
 ### Installation
