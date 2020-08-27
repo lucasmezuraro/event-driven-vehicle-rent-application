@@ -1,0 +1,67 @@
+server:
+  port: 6104
+
+management:
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: '*'
+spring:
+  application:
+    name: preparation-service
+  datasource:
+    url: "jdbc:postgresql://database_ds_preparation:5432/rentacar_preparation_service"
+    username: spring
+    password: 1234
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: user
+    password: bitnami
+  cloud:
+    stream:
+      bindings:
+#        input:
+#          destination: reserve-events
+#          consumer:
+#            durableSubscription: true
+#          group: "NEW_RESERVE"
+        reserve-channel:
+          destination: reservation
+          consumer:
+            durableSubscription: true
+            concurrency: 10
+          group: "NEW_RESERVE"
+        payment-channel:
+          destination: payment
+          consumer:
+            durableSubscription: true
+            concurrency: 5
+          group: "RESERVE_PAID2"
+        preparation-channel:
+          content-type: "application/json"
+          destination: preparation
+          group: "PREPARATION_START"
+        preparation-finish-channel:
+          content-type: "application/json"
+          destination: preparation-finish
+          group: "PREPARATION_FINISH"
+      config:
+        enabled: false
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka
+  instace:
+    hostname: localhost

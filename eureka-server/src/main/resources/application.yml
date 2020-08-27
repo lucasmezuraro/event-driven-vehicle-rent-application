@@ -1,0 +1,22 @@
+server:
+  port: 7500
+spring:
+  application:
+    name: service-descovery
+  cloud:
+    config:
+      uri: http://localhost:8888
+management:
+  security:
+    enabled: false
+  endpoint:
+    health:
+      show-details: always
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:7500/eureka
+  instace:
+    hostname: localhost

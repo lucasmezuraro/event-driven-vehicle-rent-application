@@ -1,0 +1,76 @@
+server:
+  port: 6101
+management:
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: ['*', 'hystrix.stream']
+      cors:
+        allowed-origins: true
+spring:
+  application:
+    name: reserve-service
+
+  cache:
+    type: redis
+    host: ${REDIS_HOST:localhost}
+    port: 6379
+
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/rentacar_reserve_service"
+    username: spring
+    password: 1234
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: user
+    password: bitnami
+  cloud:
+    stream:
+      bindings:
+#        output:
+#          content-type: "application/json"
+#          destination: reserve-events
+#          exchangeDurable: true
+#          group: "NEW_RESERVE"
+        reserve-channel:
+          content-type: "application/json"
+          destination: reservation
+          group: "NEW_RESERVE"
+        payment-channel:
+          destination: payment
+          consumer:
+            durableSubscription: true
+            concurrency: 8
+          group: "RESERVE_PAID"
+        preparation-channel:
+          destination: preparation
+          consumer:
+            durableSubscription: true
+            concurrency: 8
+          group: "PREPARATION_START"
+        preparation-finish-channel:
+          destination: preparation-finish
+          consumer:
+            durableSubscription: true
+            concurrency: 8
+          group: "PREPARATION_FINISH"
+      config:
+        enabled: false
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: $http://localhost:8000/eureka
+  instace:
+    hostname: localhost

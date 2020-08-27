@@ -1,0 +1,25 @@
+server:
+  port: 6050
+management:
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: '*'
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: "*"
+
+spring:
+  application:
+    name: hystrix-dashboard
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:7500/eureka
+  instace:
+    hostname: localhost

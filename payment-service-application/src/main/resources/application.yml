@@ -1,0 +1,59 @@
+server:
+  port: 6102
+management:
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: '*'
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: "jdbc:postgresql://database_payment:5432/rentacar_payment_service"
+    username: spring
+    password: 1234
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: 5672
+    username: user
+    password: bitnami
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: reserve-events
+          consumer:
+            durableSubscription: true
+          group: "NEW_RESERVE"
+        reserve-channel:
+          destination: reservation
+          consumer:
+            durableSubscription: true
+            concurrency: 10
+          group: "NEW_RESERVE"
+        payment-channel:
+          destination: payment
+          consumer:
+            durableSubscription: true
+            republishToDlq: true
+            concurrency: 5
+          group: "RESERVE_PAID"
+      config:
+        enabled: false
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka
+  instace:
+    hostname: localhost

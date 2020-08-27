@@ -1,0 +1,252 @@
+version: "3"
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: ./gateway/Dockerfile
+    container_name: gateway
+    environment: 
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka:7500/eureka"
+      ZUUL_ROUTES_RESERVE_URL: "http://reserve-service:6101/"
+      ZUUL_ROUTES_PAYMENT_URL: "http://payment-service:6102/"
+      ZUUL_ROUTES_PREPARATION_URL: "http://preparation-service:6104/"
+    ports:
+        - "8900:8000"
+    networks: 
+        - application_ds
+    links:
+      - database_reserve
+      - database_preparation
+      - database_payment
+  eureka:
+    build:
+      context: .
+      dockerfile: ./eureka-server/Dockerfile
+    container_name: eureka-server
+    ports:
+        - "8000:7500"
+    networks: 
+        - application_ds
+    links:
+      - database_reserve
+      - database_preparation
+      - database_payment
+  hytrix_dashboard:
+    build:
+      context: .
+      dockerfile: ./hystrixdashboard/Dockerfile
+    container_name: hystrix_dashboard_container
+    environment: 
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka:7500/eureka"
+    ports:
+        - "6055:6050"
+    networks: 
+        - application_ds
+    links:
+      - database_reserve
+      - database_preparation
+      - database_payment
+  
+  reserve-service:
+    build:
+      context: .
+      dockerfile: ./reserve-service-application/Dockerfile
+    container_name: reserve-service
+    environment: 
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database_reserve:5432/rentacar_reserve_service"
+      SPRING_RABBITMQ_HOST: "rabbitmq_ds_queue"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka:7500/eureka"
+      CACHE_HOST: redis_ds
+      SPRING_ZIPKIN_BASE-URL: http://zipkin:9411/
+    ports:
+        - "8011:6101"
+    networks: 
+        - application_ds
+    links:
+      - database_reserve
+      - rabbitmq_ds_queue
+      - redis_ds
+      - eureka
+      - gateway
+  
+  payment-service:
+    build:
+      context: .
+      dockerfile: ./payment-service-application/Dockerfile
+    container_name: payment-service
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database_payment:5432/rentacar_payment_service"
+      SPRING_RABBITMQ_HOST: "rabbitmq_ds_queue"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka:7500/eureka"
+      SPRING_ZIPKIN_BASE-URL: http://zipkin:9411/
+      CACHE_HOST: redis_ds
+    ports:
+        - "8012:6102"
+    networks: 
+        - application_ds
+    links:
+      - database_payment
+      - rabbitmq_ds_queue
+      - redis_ds
+
+  preparation-service:
+    build:
+      context: .
+      dockerfile: ./preparation-service-application/Dockerfile
+    container_name: preparation-service
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database_preparation:5432/rentacar_preparation_service"
+      SPRING_RABBITMQ_HOST: "rabbitmq_ds_queue"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka:7500/eureka"
+      SPRING_ZIPKIN_BASE-URL: http://zipkin:9411/
+    ports:
+        - "8013:6104"
+    networks: 
+        - application_ds
+    links:
+      - database_preparation
+      - rabbitmq_ds_queue
+      - redis_ds
+
+  #delivery-service:
+   # build:
+    #  context: .
+    #  dockerfile: ./delivery-service-application/Dockerfile
+    #container_name: delivery-service
+   # ports:
+    #    - "8015:6103"
+    #networks: 
+    #    - application
+   # links:
+    #  - database
+  database_payment:
+    container_name: database_ds_payment
+    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    volumes:
+      - 'postgresql_data_payment:/bitnami/postgresql'
+    environment:
+      POSTGRESQL_USERNAME: spring
+      POSTGRESQL_PASSWORD: 1234
+      POSTGRESQL_POSTGRES_PASSWORD: 1234
+      POSTGRESQL_DATABASE: "rentacar_payment_service"
+    ports:
+      - "5437:5432"
+    networks: 
+      - application_ds
+  database_reserve:
+    container_name: database_ds_reserve
+    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    volumes:
+      - 'postgresql_data_reserve:/bitnami/postgresql'
+    environment:
+      POSTGRESQL_USERNAME: spring
+      POSTGRESQL_PASSWORD: 1234
+      POSTGRESQL_POSTGRES_PASSWORD: 1234
+      POSTGRESQL_DATABASE: "rentacar_reserve_service"
+    ports:
+      - "5436:5432"
+    networks: 
+      - application_ds
+  database_preparation:
+    container_name: database_ds_preparation
+    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    volumes:
+      - 'postgresql_data_preparation:/bitnami/postgresql'
+    environment:
+      POSTGRESQL_USERNAME: spring
+      POSTGRESQL_PASSWORD: 1234
+      POSTGRESQL_POSTGRES_PASSWORD: 1234
+      POSTGRESQL_DATABASE: "rentacar_preparation_service"
+    ports:
+      - "5435:5432"
+    networks: 
+      - application_ds
+
+  rabbitmq_ds_queue:
+    container_name: rabbitmq_ds_queue2
+    image: 'docker.io/bitnami/rabbitmq:3.8-debian-10'
+    ports:
+      - '4369:4369'
+      - '5672:5672'
+      - '25672:25672'
+      - '15672:15672'
+    volumes:
+      - 'rabbitmq_data2:/bitnami'
+    networks: 
+      - application_ds
+  redis_ds:
+    container_name: redis_ds
+    image: 'docker.io/bitnami/redis:6.0-debian-10'
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+    networks: 
+      - application_ds
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    environment: 
+      METRICS_RESOLUTION: 5s
+    
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000" 
+    links:
+      - prometheus
+  
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mysql
+      # Point the zipkin at the storage backend
+      - MYSQL_HOST=mysql
+      # Uncomment to enable scribe
+      # - SCRIBE_ENABLED=true
+      # Uncomment to enable self-tracing
+      # - SELF_TRACING_ENABLED=true
+      # Uncomment to enable debug logging
+      # - JAVA_OPTS=-Dlogging.level.zipkin2=DEBUG
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+      # Uncomment if you set SCRIBE_ENABLED=true
+      # - 9410:9410
+    links:
+      - storage
+    networks:
+      - application_ds
+  storage:
+    image: openzipkin/zipkin-mysql
+    container_name: mysql
+    networks:
+      - application_ds
+  
+        
+networks:
+    application_ds:
+        driver: bridge
+volumes: 
+    rabbitmq_data2:
+      driver: local
+    redis_data:
+      driver: local
+    postgresql_data_reserve:
+      driver: local
+    postgresql_data_preparation:
+      driver: local
+    postgresql_data_payment:
+      driver: local
