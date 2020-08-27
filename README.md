@@ -94,23 +94,23 @@ http://localhost:8900/reserve/
 
 ### Reserve history by transactionId
 #
+
 ```
 
 method: GET
 http://localhost:8900/reserve/{transactionId}
 Ex: http://localhost:8900/reserve/dde7e07b-da8e-4c70-b44a-ee567970db46
 
-´´´
+```
 
 ### Car history by carId
 
 ```
-
 method: GET
 http://localhost:8900/car/{carId}
 Ex: http://localhost:8900/reserve/2
 
-´´´
+```
 
 #
 #
@@ -119,7 +119,7 @@ Ex: http://localhost:8900/reserve/2
 ```
 method: Get
 http://localhost:8900/payment/{transactionId}
-´´´
+```
 #
 #
 
