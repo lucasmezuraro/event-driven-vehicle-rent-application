@@ -29,6 +29,65 @@ This architeture was built with purpose of studying the event driven architeture
 ### Main feature of application:
   - You can rent a car for a time you want, then a event will dispatched for check you payment on the payment service, if it's ok, your selected car will be prepared on preparation service.
 
+### Renting a car...
+
+##### create a locator
+#
+```
+method: POST
+http://localhost:8900/reserve/
+{
+	"locator": {
+    "name": "Lucas",
+    "lastName": "Pereira",
+    "cpf": "000000000",
+    "rg": "00000000",
+    "cellPhone": "0000000"
+  }
+}
+```
+
+##### creating a car
+#
+```
+method: POST
+http://localhost:8900/car/
+{
+	"car": {
+		"name": "Uno",
+		"dayPrice": 84.90,
+		"year": "2018/2019",
+		"carBrand": "FIAT",
+		"available": true,
+		"vehiclePlate": "AAA0000"
+	}
+}
+```
+
+##### creating a reservation
+#
+```
+method: POST
+http://localhost:8900/reserve/
+{
+  "carId": 1,
+  "locatorId": 1,
+		"reserveDuration": {
+			"daysReserve": 5,
+			"startAt": "2020/08/22",
+			"endAt": "2020/08/27"
+		},
+		"pmtInfo": {
+			"name": "THVjYXM=",
+			"cpf": "OTE4MjM5ODM5MTI4Mw==",
+			"number": "OTgxMi04MzkwLTkxMjMtMzg5MQ==",
+			"yearValid": "MjAyMA=="
+		}
+}
+```
+
+[![N|Solid](https://github.com/lucasmezuraro/event-driven-vehicle-rent-application/blob/master/images/Rent_action.png)]
+
 ### Installation
 
 ```sh
