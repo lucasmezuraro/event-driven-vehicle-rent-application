@@ -92,7 +92,7 @@ http://localhost:8900/reserve/
 #
 #
 
-Reserve history by transactionId
+### Reserve history by transactionId
 #
 ```
 
@@ -102,8 +102,8 @@ Ex: http://localhost:8900/reserve/dde7e07b-da8e-4c70-b44a-ee567970db46
 
 ´´´
 
-Car history by carId
-#
+### Car history by carId
+
 ```
 
 method: GET
@@ -114,12 +114,20 @@ Ex: http://localhost:8900/reserve/2
 
 #
 #
-Payment Status
+### Payment Status
 
 ```
 method: Get
 http://localhost:8900/payment/{transactionId}
 ´´´
+#
+#
+
+### Metrics
+
+![N|Solid](https://github.com/lucasmezuraro/event-driven-vehicle-rent-application/blob/master/images/grafana.png)
+
+#
 #
 #
 
