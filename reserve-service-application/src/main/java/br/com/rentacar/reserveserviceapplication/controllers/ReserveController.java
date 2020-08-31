@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.stream.IntStream;
 
 @RestController
-@RequestMapping("/reserve")
+@RequestMapping("/reservation")
 public class ReserveController {
 
     private static final Log log = LogFactory.getLog(ReserveController.class);
