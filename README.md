@@ -3,7 +3,7 @@
 
 ## Architecture visualization
 
-(https://github.com/lucasmezuraro/event-driven-vehicle-rent-application/blob/master/images/RentaCarAchitecture.png)
+![N|Solid](https://github.com/lucasmezuraro/event-driven-vehicle-rent-application/blob/master/images/RentaCarAchitecture.png)
 
 This architeture was built with purpose of studying the event driven architeture, i worked basicly with Stream Cloud abstraction together RabbitMQ. Besides that, i added Prometheus and Grafana for catch container information for analysis, then was included Actuator for get the metrics of each individual application. For tracing was used Zipkin with Sleuth, database was used Postgres under containers, just that. About Cache, i spent sometime finding how it works and the solution is a bit of much tutorials that a found on web. 
 
