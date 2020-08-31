@@ -23,11 +23,17 @@ scrape_configs:
   - job_name: 'spring-actuator'
     metrics_path: '/actuator/prometheus'
     static_configs:
-    - targets: ['268a9212f9bb.ngrok.io','c2ebe85c9893.ngrok.io','d6930385e393.ngrok.io']
+    - targets: ['reserve-service:6101','payment-service:6102', 'preparation-service:6104']
     scrape_interval: 5s
   
   - job_name: 'windows'
     metrics_path: '/metrics'
     static_configs:
-    - targets: ['b0bd46589dfd.ngrok.io']
+    # case you use Windows like me, you will need use ngrok to create a channel for get the metrics of system.
+    - targets: ['localhost:9182']
     scrape_interval: 5s
+  
+  - job_name: cadvisor
+    scrape_interval: 5s
+    static_configs:
+    - targets: ['cadvisor:8080']

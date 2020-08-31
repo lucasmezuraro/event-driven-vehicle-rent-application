@@ -26,4 +26,10 @@ public class PaymentController {
         log.info("finding a reserve by transaction id");
         return ResponseEntity.ok(paymentGateway.findByReserveTransactionId(reserveTransactionId));
     }
+
+    @GetMapping("/hello")
+    @ResponseBody()
+    public ResponseEntity<String> show() {
+        return ResponseEntity.ok("its working");
+    }
 }

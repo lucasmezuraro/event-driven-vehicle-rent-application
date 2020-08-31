@@ -165,7 +165,7 @@ services:
 
   rabbitmq_ds_queue:
     container_name: rabbitmq_ds_queue2
-    image: 'docker.io/bitnami/rabbitmq:3.8-debian-10'
+    image: rabbitmq:3-management
     ports:
       - '4369:4369'
       - '5672:5672'
@@ -197,15 +197,22 @@ services:
       - "9090:9090"
     environment: 
       METRICS_RESOLUTION: 5s
+    links:
+      - reserve-service
+      - payment-service
+      - preparation-service
     
   grafana:
     image: grafana/grafana
     container_name: grafana
+    restart: always
     ports:
       - "3000:3000" 
     links:
       - prometheus
-  
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
@@ -235,11 +242,39 @@ services:
     networks:
       - application_ds
   
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor_container
+    privileged: true
+    ports:
+    - 8089:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /sys/fs/cgroup:/cgroup:ro
+    networks:
+      - application_ds
+    links:
+      - prometheus
+      - reserve-service
+      - payment-service
+      - preparation-service
+      - hytrix_dashboard
+      - database_reserve
+      - database_payment
+      - database_preparation
+  
         
 networks:
     application_ds:
         driver: bridge
 volumes: 
+    grafana-data:
+    grafana-config:
     rabbitmq_data2:
       driver: local
     redis_data:

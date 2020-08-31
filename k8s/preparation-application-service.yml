@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: preparation-service
+  labels:
+    app: preparation-service
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8213
+      targetPort: 6104
+      nodePort: 30013
+  selector:
+    app: preparation-service

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  serviceName: redis
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: docker.io/bitnami/redis:6.0-debian-10
+        env:
+        - name: "ALLOW_EMPTY_PASSWORD"
+          value: "yes"
+        - name: "REDIS_DISABLE_COMMANDS"
+          value: "FLUSHDB,FLUSHALL"  
+        volumeMounts:
+        - mountPath: /var/lib/redis
+          name: redis-data
+      volumes:
+        - name: redis-data
+          hostPath:
+            path: /data/redis
+            type: DirectoryOrCreate

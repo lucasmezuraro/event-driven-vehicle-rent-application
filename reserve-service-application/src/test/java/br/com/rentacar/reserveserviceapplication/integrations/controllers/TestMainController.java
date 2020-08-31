@@ -1,5 +1,6 @@
-package br.com.rentacar.reserveserviceapplication.controllers;
+package br.com.rentacar.reserveserviceapplication.integrations.controllers;
 
+import br.com.rentacar.reserveserviceapplication.controllers.MainController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

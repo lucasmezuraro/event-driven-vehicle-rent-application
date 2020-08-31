@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-reserve-stfl
+spec:
+  serviceName: "database-reserve-service"
+  replicas: 1
+  selector:
+    matchLabels:
+        app: reserve-service
+        tier: database-reserve
+  template:
+    metadata:
+      labels:
+        app: reserve-service
+        tier: database-reserve
+    spec:
+      containers:
+      - name: database-reserve
+        image: 'docker.io/bitnami/postgresql:11-debian-10'
+        envFrom:
+          - configMapRef:
+              name: pgdb-reserve-config
+        ports:
+        - containerPort: 5432
+          name: db-reserve-data
+        volumeMounts:
+        - name: db-reserve-data
+          mountPath: /var/lib/postgresql
+          subPath: postgres
+  volumeClaimTemplates:
+  - metadata:
+      name: db-reserve-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1G 

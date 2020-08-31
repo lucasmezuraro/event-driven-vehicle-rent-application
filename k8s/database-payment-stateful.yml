@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-payment-stfl
+spec:
+  serviceName: "database-payment-service"
+  replicas: 1
+  selector:
+    matchLabels:
+        app: payment-service
+        tier: database-payment
+  template:
+    metadata:
+      labels:
+        app: payment-service
+        tier: database-payment
+    spec:
+      containers:
+      - name: database-payment
+        image: 'docker.io/bitnami/postgresql:11-debian-10'
+        envFrom:
+          - configMapRef:
+              name: pgdb-payment-config
+        ports:
+        - containerPort: 5432
+          name: db-payment-data
+        volumeMounts:
+        - name: db-payment-data
+          mountPath: /var/lib/postgresql
+          subPath: postgres
+  volumeClaimTemplates:
+  - metadata:
+      name: db-payment-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1G

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-preparation-stfl
+spec:
+  serviceName: "database-preparation-service"
+  replicas: 1
+  selector:
+    matchLabels:
+        app: preparation-service
+        tier: database-preparation
+  template:
+    metadata:
+      labels:
+        app: preparation-service
+        tier: database-preparation
+    spec:
+      containers:
+      - name: database-preparation
+        image: 'docker.io/bitnami/postgresql:11-debian-10'
+        envFrom:
+          - configMapRef:
+              name: pgdb-preparation-config
+        ports:
+        - containerPort: 5432
+          name: db-prepa-data
+        volumeMounts:
+        - name: db-prepa-data
+          mountPath: /var/lib/postgresql
+          subPath: postgres
+  volumeClaimTemplates:
+  - metadata:
+      name: db-prepa-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1G 

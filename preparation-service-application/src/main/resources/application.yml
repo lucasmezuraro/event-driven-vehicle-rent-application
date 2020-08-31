@@ -7,12 +7,14 @@ management:
       show-details: always
     web:
       exposure:
-        include: '*'
+        include: ['*', 'hystrix.stream']
+      cors:
+        allowed-origins: true
 spring:
   application:
     name: preparation-service
   datasource:
-    url: "jdbc:postgresql://database_ds_preparation:5432/rentacar_preparation_service"
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/rentacar_preparation_service}
     username: spring
     password: 1234
   jpa:
@@ -23,10 +25,10 @@ spring:
     hibernate:
       ddl-auto: update
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
+    host: ${SPRING_RABBITMQ_HOST:localhost}
     port: 5672
-    username: user
-    password: bitnami
+    username: 'guest'
+    password: 'guest'
   cloud:
     stream:
       bindings:
